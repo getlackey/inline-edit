@@ -15,7 +15,20 @@ Developed for modern browsers.
     bower install
     grunt build
 
-then just open htdocs/index.html and check the example
+then open htdocs/index.html and check the example
+
+## example
+
+    <div lk-edit>
+        <div class="header">
+            <lk-api action="save"></lk-api>
+            <lk-api action="cancel"></lk-api> <!-- cancel action is optional -->
+        </div>
+        
+        <div>
+            <lk-var data-name="products.my-product.slug" data-type="text" data-placeholder="update me"></lk-var>
+        </div>
+    </div>
 
 ## Usage
 All editable fields must be wrapped up in an element with the lk-edit attribute. 
@@ -43,16 +56,3 @@ By default the type is text.
 
 #### placeholder
 Message to be used as placeholder when value is null or empty.
-
-### example
-
-    <div lk-edit>
-        <div class="header">
-            <lk-api action="save"></lk-api>
-            <lk-api action="cancel"></lk-api> <!-- cancel action is optional -->
-        </div>
-        
-        <div>
-            <lk-var data-name="products.my-product.slug" data-type="text" data-placeholder="update me"></lk-var>
-        </div>
-    </div>
