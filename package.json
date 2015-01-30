@@ -1,5 +1,5 @@
 {
-    "name": "lackey",
+    "name": "lackey-inline-edit",
     "version": "0.0.0",
     "description": "Angularjs Inline editor",
     "main": "editor/index.js",
