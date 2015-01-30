@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="lkEdit">
+    <head>
+        <title>Example page</title>
+        <meta charset="utf-8">
+        <meta name="author" content="Enigma Marketing">
+        <link type="text/css" rel="stylesheet" media="all" href="./css/example.css">
+    </head>
+
+    <body lk-edit>
+        <lk-api action="save">Save</lk-api>
+        <lk-api action="cancel">Cancel</lk-api>
+
+        <br><br>
+        
+        <div>
+            <div>
+                Text:<br>
+                <lk-var name="examples.my-test.title"></lk-var>
+            </div>
+        </div>
+
+        <script src="./js/example.js"></script>
+    </body>
+</html>

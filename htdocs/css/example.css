@@ -1,0 +1,36 @@
+
+lk-var .placeholder, 
+lk-var .input {
+    display: none;
+}
+
+
+lk-var.no-data .value {
+    display: none;
+}
+lk-var.no-data .input {
+    display: none;
+}
+lk-var.no-data .placeholder {
+    display: initial;
+}
+
+
+lk-var.edit .value {
+    display: none;
+}
+lk-var.edit .input {
+    display: initial;
+}
+lk-var.edit .placeholder {
+    display: none;
+}
+
+button {
+    color: #000;
+    cursor: pointer;
+}
+button[disabled] {
+    color: #eee;
+    cursor: default;
+}
