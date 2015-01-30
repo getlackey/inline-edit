@@ -43287,7 +43287,7 @@ return jQuery;
 */
 
 module.exports = function (app) {
-    var Directive = function (apiCtrl) {
+    var Directive = function () {
         var directive = {};
 
         directive.require = '^lkEdit';
@@ -43320,12 +43320,35 @@ module.exports = function (app) {
                     };
                 }
             });
+
+            lkEdit.$scope.$on('error', function (err) {
+                console.error(err);
+            });
+
+            lkEdit.$scope.$on('saved', function (err) {
+                window.onbeforeunload = null;
+                button.attr('disabled', true);
+            });
+
+            lkEdit.$scope.$on('reloaded', function (err) {
+                window.onbeforeunload = null;
+                button.attr('disabled', true);
+            });
+
+            button.click(function () {
+                var action = attr.action;
+                if (action === 'cancel') {
+                    lkEdit.reloadAll();
+                } else if (action === 'save') {
+                    lkEdit.saveAll();
+                }
+            });
         };
 
         return directive;
     };
 
-    app.directive('lkApi', ['lkApi', Directive]);
+    app.directive('lkApi', Directive);
 
     return app;
 };
@@ -43349,8 +43372,13 @@ module.exports = function (app) {
 */
 
 module.exports = function (app) {
-    var Directive = function () {
-        var directive = {};
+    var Directive = function (Restangular, $timeout, $q) {
+        var deep = require('deep-get-set'),
+            directive = {},
+            pendingRequests = [],
+            completeRequests = {};
+
+        deep.p = true; //hack to create empty objects
 
         directive.restrict = 'A';
 
@@ -43363,30 +43391,121 @@ module.exports = function (app) {
             // check directives/var.js
             self.$scope = $scope;
 
-            self.getData = function (name) {
+            self.parseName = function (name) {
+                var opts = {},
+                    parts = name.split('.');
 
-                setTimeout(function () {
-                    $scope.$apply(function () {
-                        $scope.examples = {
-                            'my-test': {
-                                title: name
-                            }
-                        };
-                    });
-                }, 100);
+                opts.name = name;
+                opts.entity = parts[0];
+                opts.id = parts[1];
+                opts.property = parts.slice(2).join('.');
+
+                return opts;
+            };
+
+            self.getData = function (name) {
+                var opts = self.parseName(name),
+                    Entity = Restangular.all(opts.entity),
+                    isRequestPending = (pendingRequests.indexOf(opts.entity + '.' + opts.id) !== -1),
+                    hasBeenRequested = $scope[opts.entity];
+
+                if (!hasBeenRequested && !isRequestPending) {
+                    //add to pending requests
+                    pendingRequests.push(opts.entity + '.' + opts.id);
+
+                    // get data from API
+                    Entity
+                        .get(opts.id)
+                        .then(function (data) {
+                            // remove from pending requests
+                            pendingRequests.splice(pendingRequests.indexOf(opts.entity + '.' + opts.id), 1);
+
+                            $timeout(function () {
+                                $scope.$apply(function () {
+                                    var value;
+                                    // add the API response to the $scope
+                                    deep($scope, opts.entity + '.' + opts.id, data);
+                                    // cache in complete requests so we can quicly access it
+                                    completeRequests[opts.entity] = $scope[opts.entity];
+                                    // if the requested property is missing
+                                    // create it
+                                    value = deep($scope, opts.name);
+                                    if (value === undefined) {
+                                        deep($scope, opts.name, '');
+                                    }
+                                });
+                            });
+                        }, function (err) {
+                            self.$scope.$emit('error', err);
+                        });
+                }
 
                 return $scope;
+            };
+
+            self.saveAll = function () {
+                var promisses = [];
+
+                Object.keys(completeRequests).forEach(function (entity) {
+                    var Entity = completeRequests[entity];
+
+                    Object.keys(Entity).forEach(function (id) {
+                        var item = Entity[id];
+
+                        promisses.push(item.save());
+                    });
+                });
+
+                $q.all(promisses).then(function (data) {
+                    self.$scope.$emit('saved');
+                }, function (err) {
+                    self.$scope.$emit('error', err);
+                });
+            };
+
+
+            // iterates the $scope obj and applies as get to all 
+            // restangular objects
+            self.reloadAll = function () {
+                var promisses = [];
+
+                Object.keys(completeRequests).forEach(function (entity) {
+                    var Entity = completeRequests[entity];
+
+                    Object.keys(Entity).forEach(function (id) {
+                        var item = Entity[id],
+                            promise;
+
+                        promise = item.get().then(function (data) {
+                            $timeout(function () {
+                                $scope.$apply(function () {
+                                    // add the API response to the $scope
+                                    deep($scope, entity + '.' + id, data);
+                                });
+                            });
+                        });
+
+                        promisses.push(promise);
+                    });
+                });
+
+
+                $q.all(promisses).then(function (data) {
+                    self.$scope.$emit('reloaded');
+                }, function (err) {
+                    self.$scope.$emit('error', err);
+                });
             };
         };
 
         return directive;
     };
 
-    app.directive('lkEdit', ['lkApi', Directive]);
+    app.directive('lkEdit', ['Restangular', '$timeout', '$q', Directive]);
 
     return app;
 };
-},{}],7:[function(require,module,exports){
+},{"deep-get-set":13}],7:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -43568,10 +43687,25 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":12,"./lk-var-types":7}],10:[function(require,module,exports){
+},{"../helpers/escape-name":11,"./lk-var-types":7}],10:[function(require,module,exports){
 /*jslint node:true, browser:true, nomen: true */
 /*global angular */
 'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 
 var editor = require('./index.js'),
     app,
@@ -43601,13 +43735,12 @@ require("./../bower_components/angular-sanitize/angular-sanitize.js");
  *
  * ******************************************/
 
-
 // Our app - choose a name, this is just an example
 app = angular.module('lkEdit', ['restangular', 'ngSanitize']);
 
 app.config(function (RestangularProvider) {
     // This defines where our REST API is defined
-    RestangularProvider.setBaseUrl('http://localhost:8000/api/v1');
+    RestangularProvider.setBaseUrl('http://127.0.0.1:8000/api/v1');
 });
 
 // initialise our editor
@@ -43617,35 +43750,7 @@ module.exports = function () {
     // just because.... 
     return app;
 };
-},{"./../bower_components/angular-sanitize/angular-sanitize.js":1,"./../bower_components/angular/angular.js":2,"./../bower_components/jquery/dist/jquery.js":3,"./../bower_components/lodash/dist/lodash.compat.js":4,"./index.js":13,"restangular":14}],11:[function(require,module,exports){
-/*jslint node:true, browser:true */
-'use strict';
-/*
-    Copyright 2015 Enigma Marketing Services Limited
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
-
-module.exports = function (app) {
-    app.factory('lkApi', function lkApiFactory() {
-        return {
-            test: 'ok'
-        };
-    });
-
-    return app;
-};
-},{}],12:[function(require,module,exports){
+},{"./../bower_components/angular-sanitize/angular-sanitize.js":1,"./../bower_components/angular/angular.js":2,"./../bower_components/jquery/dist/jquery.js":3,"./../bower_components/lodash/dist/lodash.compat.js":4,"./index.js":12,"restangular":14}],11:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -43680,19 +43785,67 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 
 module.exports = function (app) {
-    app = require('./factories/api')(app); // does all HTTP requests
-    app = require('./directives/edit')(app); // master edit directive. Holds all edited data
-    app = require('./directives/api')(app); // implements save and cancel buttons
-    app = require('./directives/var')(app); // interface to edit data. Check widgets in ./lk-var-types
+    // master edit directive. Holds all edited data and does HTTP requests
+    app = require('./directives/edit')(app);
+    // implements save and cancel buttons
+    app = require('./directives/api')(app);
+    // interface to edit data. Check widgets in ./lk-var-types
+    app = require('./directives/var')(app);
 
     return app;
 };
-},{"./directives/api":5,"./directives/edit":6,"./directives/var":9,"./factories/api":11}],14:[function(require,module,exports){
+},{"./directives/api":5,"./directives/edit":6,"./directives/var":9}],13:[function(require,module,exports){
+module.exports = deep;
+
+function deep (obj, path, value) {
+  if (arguments.length === 3) return set.apply(null, arguments);
+  return get.apply(null, arguments);
+}
+
+function get (obj, path) {
+  var keys = path.split('.');
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    if (!obj || !hasOwnProperty.call(obj, key)) {
+      obj = undefined;
+      break;
+    }
+    obj = obj[key];
+  }
+  return obj;
+}
+
+function set (obj, path, value) {
+  var keys = path.split('.');
+  for (var i = 0; i < keys.length - 1; i++) {
+    var key = keys[i];
+    if (deep.p && !hasOwnProperty.call(obj, key)) obj[key] = {};
+    obj = obj[key];
+  }
+  obj[keys[i]] = value;
+  return value;
+}
+},{}],14:[function(require,module,exports){
 /**
  * Restful Resources service for AngularJS apps
  * @version v1.4.0 - 2014-04-25 * @link https://github.com/mgonto/restangular

@@ -23,13 +23,16 @@
     "devDependencies": {
         "debowerify": "^1.2.0",
         "grunt": "^0.4.5",
-        "restangular": "^1.4.0",
         "grunt-browserify": "^3.2.1",
         "grunt-config-dir": "^0.3.2",
         "grunt-contrib-uglify": "^0.7.0",
         "grunt-contrib-watch": "^0.6.1",
         "grunt-jslint": "^1.1.12",
         "grunt-shell": "^1.1.1",
-        "grunt-supervisor": "^0.2.4"
+        "grunt-supervisor": "^0.2.4",
+        "restangular": "^1.4.0"
+    },
+    "dependencies": {
+        "deep-get-set": "^0.1.1"
     }
 }
