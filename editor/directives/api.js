@@ -17,7 +17,7 @@
 */
 
 module.exports = function (app) {
-    var Directive = function (apiCtrl) {
+    var Directive = function () {
         var directive = {};
 
         directive.require = '^lkEdit';
@@ -50,12 +50,39 @@ module.exports = function (app) {
                     };
                 }
             });
+
+            lkEdit.$scope.$on('error', function (err) {
+                console.error(err);
+            });
+
+            lkEdit.$scope.$on('saved', function (err) {
+                window.onbeforeunload = null;
+                button.attr('disabled', true);
+            });
+
+            lkEdit.$scope.$on('reloaded', function (err) {
+                // the event is emitted before the $watch is triggered
+                // and the changed event is emitted
+                setTimeout(function () {
+                    window.onbeforeunload = null;
+                    button.attr('disabled', true);
+                });
+            });
+
+            button.click(function () {
+                var action = attr.action;
+                if (action === 'cancel') {
+                    lkEdit.reloadAll();
+                } else if (action === 'save') {
+                    lkEdit.saveAll();
+                }
+            });
         };
 
         return directive;
     };
 
-    app.directive('lkApi', ['lkApi', Directive]);
+    app.directive('lkApi', Directive);
 
     return app;
 };

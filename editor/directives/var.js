@@ -48,7 +48,6 @@ module.exports = function (app) {
             varName = 'data';
             if (attr.name) {
                 varName += '.' + attr.name;
-                varName = escapeName(varName);
             }
             attr.varName = varName;
 
@@ -76,7 +75,7 @@ module.exports = function (app) {
                 $scope.data = data;
             } else {
                 if (!$scope.model) {
-                    throw new Error('at leas a name or model property must be defined');
+                    throw new Error('at least a name or model property must be defined');
                 }
                 $scope.data = $scope.model;
             }
@@ -93,7 +92,7 @@ module.exports = function (app) {
                 });
             });
 
-            $scope.$watch(attr.varName, function (current, previous) {
+            $scope.$watch(escapeName(attr.varName), function (current, previous) {
                 if (current === undefined) {
                     return;
                 }
@@ -109,7 +108,7 @@ module.exports = function (app) {
                         lkEdit.$scope.$emit('changed');
                     }
                 }
-            });
+            }, true);
 
             // each content type has a different template and different behaviours
             if (directiveTypes[type] && directiveTypes[type].link) {

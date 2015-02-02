@@ -18,5 +18,6 @@
 
 
 module.exports = {
-    text: require('./text')
+    text: require('./text'),
+    list: require('./list')
 };
