@@ -101,7 +101,7 @@ module.exports = function (app) {
                     });
                 });
 
-                $q.all(promisses).then(function (data) {
+                $q.all(promisses).then(function () {
                     self.$scope.$emit('saved');
                 }, function (err) {
                     self.$scope.$emit('error', err);
@@ -135,7 +135,7 @@ module.exports = function (app) {
                 });
 
 
-                $q.all(promisses).then(function (data) {
+                $q.all(promisses).then(function () {
                     self.$scope.$emit('reloaded');
                 }, function (err) {
                     self.$scope.$emit('error', err);
