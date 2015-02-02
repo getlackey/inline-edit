@@ -43973,7 +43973,7 @@ app.config(function (RestangularProvider) {
 app.controller('lkExample', function ($scope) {
     $scope.myData = {
         title: 'My 1st title',
-        list: [{
+        items: [{
             title: '1st'
         }, {
             title: '2nd'
