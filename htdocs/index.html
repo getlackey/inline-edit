@@ -13,10 +13,15 @@
 
         <br><br>
         
-        <div>
+        <div data-ng-controller="lkExample">
             <div>
                 Text:<br>
-                <lk-var name="examples.my-test.title"></lk-var>
+                <lk-var model="title" type="text"></lk-var>
+            </div>
+
+            <div>
+                List:<br>
+                <lk-var model="list" type="list"></lk-var>
             </div>
         </div>
 

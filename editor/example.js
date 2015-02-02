@@ -53,6 +53,14 @@ app.config(function (RestangularProvider) {
     RestangularProvider.setBaseUrl('http://127.0.0.1:8000/api/v1');
 });
 
+app.controller('lkExample', function ($scope) {
+    $scope.title = 'My 1st title';
+    $scope.list = [{
+        title: '1st'
+    }, {
+        title: '2nd'
+    }];
+});
 // initialise our editor
 app = editor(app);
 

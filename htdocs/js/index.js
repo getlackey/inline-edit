@@ -187,7 +187,7 @@ module.exports = function (app) {
                     });
                 });
 
-                $q.all(promisses).then(function (data) {
+                $q.all(promisses).then(function () {
                     self.$scope.$emit('saved');
                 }, function (err) {
                     self.$scope.$emit('error', err);
@@ -221,7 +221,7 @@ module.exports = function (app) {
                 });
 
 
-                $q.all(promisses).then(function (data) {
+                $q.all(promisses).then(function () {
                     self.$scope.$emit('reloaded');
                 }, function (err) {
                     self.$scope.$emit('error', err);
@@ -236,7 +236,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":8}],3:[function(require,module,exports){
+},{"deep-get-set":9}],3:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -257,9 +257,65 @@ module.exports = function (app) {
 
 
 module.exports = {
-    text: require('./text')
+    text: require('./text'),
+    list: require('./list')
 };
-},{"./text":4}],4:[function(require,module,exports){
+},{"./list":4,"./text":5}],4:[function(require,module,exports){
+/*jslint node:true, browser:true, nomen:true, unparam:true  */
+'use strict';
+
+var deep = require('deep-get-set');
+
+deep.p = true; //hack to create empty objects
+
+module.exports.template = function (element, attr) {
+    var html = '',
+        template = (element[0] && element[0].innerHTML) || '{{ item.title }} <span class="delete-item">[x]<span>',
+        condition = attr['if'],
+        name = attr.varName;
+
+    html += '<ul>';
+    html += '  <li class="list-item" data-ng-repeat="item in ' + name + '" data-id="{{ item._id }}"';
+    if (condition) {
+        html += ' data-ng-if="' + condition + '"';
+    }
+    html += '>' + template + '</li>';
+    html += '</ul>';
+
+    return html;
+};
+
+module.exports.link = function ($scope, element, attr, lkEdit) {
+    var name = attr.varName,
+        list = element.find('ul:first');
+
+    element.click(function (e) {
+        var elm = e.target,
+            item = elm,
+            index;
+
+        if (!elm.classList.contains('delete-item')) {
+            return;
+        }
+
+        while (item && !item.classList.contains('list-item')) {
+            item = item.parentElement;
+        }
+
+        if (!item) {
+            return;
+        }
+
+        index = list.find('li').index(item);
+
+        if (index !== -1) {
+            $scope.$apply(function () {
+                $scope[name].splice(index, 1);
+            });
+        }
+    });
+};
+},{"deep-get-set":9}],5:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -293,7 +349,7 @@ module.exports.template = function (element, attr) {
 // module.exports.link = function ($scope, element, attr, lkEdit) {
 
 // };
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -405,7 +461,7 @@ module.exports = function (app) {
                         lkEdit.$scope.$emit('changed');
                     }
                 }
-            });
+            }, true);
 
             // each content type has a different template and different behaviours
             if (directiveTypes[type] && directiveTypes[type].link) {
@@ -418,7 +474,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":6,"./lk-var-types":3}],6:[function(require,module,exports){
+},{"../helpers/escape-name":7,"./lk-var-types":3}],7:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -453,7 +509,7 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -482,7 +538,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"./directives/api":1,"./directives/edit":2,"./directives/var":5}],8:[function(require,module,exports){
+},{"./directives/api":1,"./directives/edit":2,"./directives/var":6}],9:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -513,4 +569,4 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
-},{}]},{},[7]);
+},{}]},{},[8]);
