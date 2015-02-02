@@ -1,8 +1,4 @@
 # Inline Edit
-
-WORK IN PROGRESS. NOT READY YET
-
-
 Angularjs implementation of in-line editing. Assumes all data is passed as an angular model or an HTTP resource following a naming convention.
 
 Requires angularjs, angular-sanitize and restangular.
