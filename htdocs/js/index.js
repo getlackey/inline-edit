@@ -62,8 +62,12 @@ module.exports = function (app) {
             });
 
             lkEdit.$scope.$on('reloaded', function (err) {
-                window.onbeforeunload = null;
-                button.attr('disabled', true);
+                // the event is emitted before the $watch is triggered
+                // and the changed event is emitted
+                setTimeout(function () {
+                    window.onbeforeunload = null;
+                    button.attr('disabled', true);
+                });
             });
 
             button.click(function () {
@@ -449,6 +453,7 @@ module.exports = function (app) {
 
                         if (data) {
                             $scope.search.items = data.plain().map(function (item) {
+                                //fix schema so that id is the canonical attribute
                                 if (!item._id) {
                                     item._id = item.id;
                                 }
@@ -491,6 +496,7 @@ module.exports = function (app) {
                     if (item.id === id) {
                         $scope.$apply(function () {
                             var scopeList = deep($scope, varName);
+
                             if (!Array.isArray(scopeList)) {
                                 deep($scope, varName, []);
                                 scopeList = deep($scope, varName);

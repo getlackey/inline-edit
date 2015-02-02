@@ -61,8 +61,12 @@ module.exports = function (app) {
             });
 
             lkEdit.$scope.$on('reloaded', function (err) {
-                window.onbeforeunload = null;
-                button.attr('disabled', true);
+                // the event is emitted before the $watch is triggered
+                // and the changed event is emitted
+                setTimeout(function () {
+                    window.onbeforeunload = null;
+                    button.attr('disabled', true);
+                });
             });
 
             button.click(function () {

@@ -91,6 +91,7 @@ module.exports = function (app) {
 
                         if (data) {
                             $scope.search.items = data.plain().map(function (item) {
+                                //fix schema so that id is the canonical attribute
                                 if (!item._id) {
                                     item._id = item.id;
                                 }
@@ -133,6 +134,7 @@ module.exports = function (app) {
                     if (item.id === id) {
                         $scope.$apply(function () {
                             var scopeList = deep($scope, varName);
+
                             if (!Array.isArray(scopeList)) {
                                 deep($scope, varName, []);
                                 scopeList = deep($scope, varName);
