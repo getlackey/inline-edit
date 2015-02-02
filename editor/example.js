@@ -57,10 +57,13 @@ app.controller('lkExample', function ($scope) {
     $scope.myData = {
         title: 'My 1st title',
         items: [{
-            title: '1st'
+            title: '1st',
+            type: 'A'
         }, {
-            title: '2nd'
-        }]
+            title: '2nd',
+            type: 'B'
+        }],
+        isValid: true
     };
 });
 

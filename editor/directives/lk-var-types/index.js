@@ -19,5 +19,6 @@
 
 module.exports = {
     text: require('./text'),
+    boolean: require('./boolean'),
     list: require('./list')
 };

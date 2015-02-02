@@ -29,26 +29,47 @@ then open htdocs/index.html and check the example
 ## Usage
 All editable fields must be wrapped up in an element with the lk-edit attribute. 
 
-The save and cancel (to restore database values) buttons are created with <lk-api action=save|cancel>. These tags must also be contained inside the edit tag.
-Finally any editable text should be inserted with the <lk-var> tag
+The save and cancel (to restore database values) buttons are created with &lt;lk-api action=save|cancel&gt;. These tags must also be contained inside the edit tag.
+Finally any editable text should be inserted with the &lt;lk-var&gt; tag
 
-### <lk-api>
-just accepts one attribute - action. Action can only be save or cancel. Cancel pulls all data from the API and restores all values.
+### &lt;lk-api&gt;
+just accepts one attribute: action. 
 
-### <lk-var>
+Action can only be save or cancel. Cancel pulls all data from the API and restores all values.
+
+### &lt;lk-var&gt;
 takes the following attributes:
 
 #### name 
-one of name or model is required. 
+one of name or model is required. Name is a representation of an api request. All '/' are replaced by '.'.
 
-name is a representation of an api request. All '/' are replaced by '.'.
+For instance:
+	
+	http://localhost/products/a-product/title
+
+becomes
+
+	products.a-product.title
+
+The http://localhost will be defined in the restangular base url configuration
+
+	app.config(function (RestangularProvider) {
+    	// This defines where our REST API is defined
+    	RestangularProvider.setBaseUrl('http://127.0.0.1:8000/api/v1');
+	});
+Please check the [example](./editor/example.js) file.
 
 #### model
 Angular model. We're assuming this angular model is some nested property where data came from the REST API, otherwise cancel and save buttons will do nothing.
 
 #### type
-(todo)
-By default the type is text.
+By default the type is text. 
+
+Full list of available types:
+
+- [text](./editor/directives/lk-var-types/text.md)
+- [boolean](./editor/directives/lk-var-types/boolean.md)
+- [list](./editor/directives/lk-var-types/list.md)
 
 #### placeholder
-Message to be used as placeholder when value is null or empty.
+Message to be used as placeholder when value is null or empty. Not all elements support this property.

@@ -242,7 +242,35 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":10}],3:[function(require,module,exports){
+},{"deep-get-set":11}],3:[function(require,module,exports){
+/*jslint node:true, browser:true, unparam:true */
+'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+var escapeName = require('../../helpers/escape-name');
+
+module.exports.template = function (element, attr) {
+    var html = '',
+        name = escapeName(attr.varName);
+
+    html = '<input type="checkbox" class="eh-data-item" data-ng-name="' + name + '" data-ng-model="' + name + '" />';
+    return html;
+};
+},{"../../helpers/escape-name":9}],4:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -264,9 +292,10 @@ module.exports = function (app) {
 
 module.exports = {
     text: require('./text'),
+    boolean: require('./boolean'),
     list: require('./list')
 };
-},{"./list":4,"./text":5}],4:[function(require,module,exports){
+},{"./boolean":3,"./list":5,"./text":6}],5:[function(require,module,exports){
 /*jslint node:true, browser:true, nomen:true, unparam:true  */
 'use strict';
 
@@ -282,7 +311,7 @@ module.exports.template = function (element, attr) {
         varName = escapeName(attr.varName);
 
     html += '<ul>';
-    html += '  <li class="list-item" data-ng-repeat="item in ' + varName + '" data-id="{{ item._id }}"';
+    html += '  <li class="list-item" data-ng-repeat="item in ' + varName + '" data-id="{{ item.id }}"';
     if (condition) {
         html += ' data-ng-if="' + condition + '"';
     }
@@ -323,7 +352,7 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
         }
     });
 };
-},{"../../helpers/escape-name":8,"deep-get-set":10}],5:[function(require,module,exports){
+},{"../../helpers/escape-name":9,"deep-get-set":11}],6:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -355,11 +384,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-
-// module.exports.link = function ($scope, element, attr, lkEdit) {
-
-// };
-},{"../../helpers/escape-name":8}],6:[function(require,module,exports){
+},{"../../helpers/escape-name":9}],7:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true, nomen:true */
 'use strict';
 
@@ -521,7 +546,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":8,"deep-get-set":10}],7:[function(require,module,exports){
+},{"../helpers/escape-name":9,"deep-get-set":11}],8:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -645,7 +670,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":8,"./lk-var-types":3}],8:[function(require,module,exports){
+},{"../helpers/escape-name":9,"./lk-var-types":4}],9:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -680,7 +705,7 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -711,7 +736,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"./directives/api":1,"./directives/edit":2,"./directives/search":6,"./directives/var":7}],10:[function(require,module,exports){
+},{"./directives/api":1,"./directives/edit":2,"./directives/search":7,"./directives/var":8}],11:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -742,4 +767,4 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
-},{}]},{},[9]);
+},{}]},{},[10]);
