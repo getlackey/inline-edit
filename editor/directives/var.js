@@ -109,7 +109,7 @@ module.exports = function (app) {
                         lkEdit.$scope.$emit('changed');
                     }
                 }
-            });
+            }, true);
 
             // each content type has a different template and different behaviours
             if (directiveTypes[type] && directiveTypes[type].link) {
