@@ -1,7 +1,8 @@
 /*jslint node:true, browser:true, nomen:true, unparam:true  */
 'use strict';
 
-var deep = require('deep-get-set');
+var deep = require('deep-get-set'),
+    escapeName = require('../../helpers/escape-name');
 
 deep.p = true; //hack to create empty objects
 
@@ -9,10 +10,10 @@ module.exports.template = function (element, attr) {
     var html = '',
         template = (element[0] && element[0].innerHTML) || '{{ item.title }} <span class="delete-item">[x]<span>',
         condition = attr['if'],
-        name = attr.varName;
+        varName = escapeName(attr.varName);
 
     html += '<ul>';
-    html += '  <li class="list-item" data-ng-repeat="item in ' + name + '" data-id="{{ item._id }}"';
+    html += '  <li class="list-item" data-ng-repeat="item in ' + varName + '" data-id="{{ item._id }}"';
     if (condition) {
         html += ' data-ng-if="' + condition + '"';
     }
@@ -23,7 +24,7 @@ module.exports.template = function (element, attr) {
 };
 
 module.exports.link = function ($scope, element, attr, lkEdit) {
-    var name = attr.varName,
+    var varName = attr.varName,
         list = element.find('ul:first');
 
     element.click(function (e) {
@@ -47,7 +48,8 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
 
         if (index !== -1) {
             $scope.$apply(function () {
-                $scope[name].splice(index, 1);
+                var scopeList = deep($scope, varName);
+                scopeList.splice(index, 1);
             });
         }
     });

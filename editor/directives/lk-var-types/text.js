@@ -16,9 +16,11 @@
     limitations under the License.
 */
 
+var escapeName = require('../../helpers/escape-name');
+
 module.exports.template = function (element, attr) {
     var html = '',
-        name = attr.varName,
+        name = escapeName(attr.varName),
         placeholder = attr.placeholder;
 
     html += '<span class="value" data-ng-bind-html="' + name + '"></span>';

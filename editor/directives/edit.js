@@ -52,11 +52,13 @@ module.exports = function (app) {
                 var opts = self.parseName(name),
                     Entity = Restangular.all(opts.entity),
                     isRequestPending = (pendingRequests.indexOf(opts.entity + '.' + opts.id) !== -1),
-                    hasBeenRequested = $scope[opts.entity];
+                    hasBeenRequested = !!($scope[opts.entity] && $scope[opts.entity][opts.id]);
 
                 if (!hasBeenRequested && !isRequestPending) {
-                    //add to pending requests
+                    // add to pending requests
                     pendingRequests.push(opts.entity + '.' + opts.id);
+                    // create an empty object for that entity in the scope
+                    $scope[opts.entity] = {};
 
                     // get data from API
                     Entity

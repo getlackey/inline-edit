@@ -54,13 +54,16 @@ app.config(function (RestangularProvider) {
 });
 
 app.controller('lkExample', function ($scope) {
-    $scope.title = 'My 1st title';
-    $scope.list = [{
-        title: '1st'
-    }, {
-        title: '2nd'
-    }];
+    $scope.myData = {
+        title: 'My 1st title',
+        list: [{
+            title: '1st'
+        }, {
+            title: '2nd'
+        }]
+    };
 });
+
 // initialise our editor
 app = editor(app);
 

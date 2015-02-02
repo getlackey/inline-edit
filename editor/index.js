@@ -23,6 +23,8 @@ module.exports = function (app) {
     app = require('./directives/api')(app);
     // interface to edit data. Check widgets in ./lk-var-types
     app = require('./directives/var')(app);
+    // searches items in an API and adds them to an angular model
+    app = require('./directives/search')(app);
 
     return app;
 };

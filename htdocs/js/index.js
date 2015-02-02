@@ -138,11 +138,13 @@ module.exports = function (app) {
                 var opts = self.parseName(name),
                     Entity = Restangular.all(opts.entity),
                     isRequestPending = (pendingRequests.indexOf(opts.entity + '.' + opts.id) !== -1),
-                    hasBeenRequested = $scope[opts.entity];
+                    hasBeenRequested = !!($scope[opts.entity] && $scope[opts.entity][opts.id]);
 
                 if (!hasBeenRequested && !isRequestPending) {
-                    //add to pending requests
+                    // add to pending requests
                     pendingRequests.push(opts.entity + '.' + opts.id);
+                    // create an empty object for that entity in the scope
+                    $scope[opts.entity] = {};
 
                     // get data from API
                     Entity
@@ -236,7 +238,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":9}],3:[function(require,module,exports){
+},{"deep-get-set":10}],3:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -264,7 +266,8 @@ module.exports = {
 /*jslint node:true, browser:true, nomen:true, unparam:true  */
 'use strict';
 
-var deep = require('deep-get-set');
+var deep = require('deep-get-set'),
+    escapeName = require('../../helpers/escape-name');
 
 deep.p = true; //hack to create empty objects
 
@@ -272,10 +275,10 @@ module.exports.template = function (element, attr) {
     var html = '',
         template = (element[0] && element[0].innerHTML) || '{{ item.title }} <span class="delete-item">[x]<span>',
         condition = attr['if'],
-        name = attr.varName;
+        varName = escapeName(attr.varName);
 
     html += '<ul>';
-    html += '  <li class="list-item" data-ng-repeat="item in ' + name + '" data-id="{{ item._id }}"';
+    html += '  <li class="list-item" data-ng-repeat="item in ' + varName + '" data-id="{{ item._id }}"';
     if (condition) {
         html += ' data-ng-if="' + condition + '"';
     }
@@ -286,7 +289,7 @@ module.exports.template = function (element, attr) {
 };
 
 module.exports.link = function ($scope, element, attr, lkEdit) {
-    var name = attr.varName,
+    var varName = attr.varName,
         list = element.find('ul:first');
 
     element.click(function (e) {
@@ -310,12 +313,13 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
 
         if (index !== -1) {
             $scope.$apply(function () {
-                $scope[name].splice(index, 1);
+                var scopeList = deep($scope, varName);
+                scopeList.splice(index, 1);
             });
         }
     });
 };
-},{"deep-get-set":9}],5:[function(require,module,exports){
+},{"../../helpers/escape-name":8,"deep-get-set":10}],5:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -334,9 +338,11 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
     limitations under the License.
 */
 
+var escapeName = require('../../helpers/escape-name');
+
 module.exports.template = function (element, attr) {
     var html = '',
-        name = attr.varName,
+        name = escapeName(attr.varName),
         placeholder = attr.placeholder;
 
     html += '<span class="value" data-ng-bind-html="' + name + '"></span>';
@@ -349,7 +355,167 @@ module.exports.template = function (element, attr) {
 // module.exports.link = function ($scope, element, attr, lkEdit) {
 
 // };
-},{}],6:[function(require,module,exports){
+},{"../../helpers/escape-name":8}],6:[function(require,module,exports){
+/*jslint node:true, browser:true, unparam:true, nomen:true */
+'use strict';
+
+var escapeName = require('../helpers/escape-name'),
+    deep = require('deep-get-set');
+
+deep.p = true; //hack to create empty objects
+
+module.exports = function (app) {
+    var Directive = function (Restangular, $timeout) {
+        var directive = {};
+
+        directive.require = '^lkEdit';
+
+        directive.restrict = 'E';
+
+        directive.scope = {
+            model: '='
+        };
+
+        directive.template = function (element, attr) {
+            var html = '',
+                field = attr.match;
+
+            html += '<button class="add-new">Add Item</button>';
+            html += '<div class="search">';
+            html += '  <div><input type="text" data-ng-name="search.query" data-ng-model="search.query" placeholder="Search item" /></div>';
+            html += '  <div class="results" ng-show="search.items">';
+            html += '    <p>Results for {{search.query}} </p>';
+            html += '    <ul>';
+            html += '      <li data-ng-repeat="item in search.items" data-id="{{ item._id }}">{{ item.' + field + ' }} [+]</li>';
+            html += '    </ul>';
+            html += '  </div>';
+            html += '</div>';
+
+            return html;
+        };
+
+        directive.link = function ($scope, element, attr, lkEdit) {
+            var $addNewElm = element.find('.add-new'),
+                $searchElm = element.find('.search'),
+                $inputElm = element.find('input'),
+                $resultsElm = element.find('.results'),
+                field = attr.match,
+                filter = (attr.filter && attr.filter + ',') || '',
+                Entity = Restangular.all(attr.resource),
+                data,
+                varName;
+
+            varName = 'data';
+            if (attr.name) {
+                varName += '.' + attr.name;
+            }
+
+            $scope.search = {
+                query: '',
+                items: []
+            };
+
+            // Get Data
+            if (attr.name) {
+                data = lkEdit.getData(attr.name);
+                $scope.data = data;
+            } else {
+                if (!$scope.model) {
+                    throw new Error('at least a name or model property must be defined');
+                }
+                $scope.data = $scope.model;
+            }
+
+            function runQuery(query) {
+                var opts = {};
+
+                if (runQuery.pending) {
+                    return;
+                }
+
+                runQuery.pending = true;
+
+                opts.limit = 10;
+                opts.filter = filter + field + ':*' + query;
+
+                Entity
+                    .getList(opts)
+                    .then(function (data) {
+                        runQuery.pending = false;
+
+                        if (query !== $scope.search.query) {
+                            setImmediate(runQuery, $scope.search.query);
+                        }
+
+                        if (data) {
+                            $scope.search.items = data.plain().map(function (item) {
+                                if (!item._id) {
+                                    item._id = item.id;
+                                }
+                                return item;
+                            });
+                        } else {
+                            $scope.search.items = [];
+                        }
+                    }, function (err) {
+                        runQuery.pending = false;
+                        $scope.search.items = [];
+                    });
+            }
+
+            $addNewElm.click(function () {
+                $addNewElm.hide();
+                $searchElm.show();
+                $inputElm.focus();
+            });
+
+            $scope.$watch('search.query', function () {
+                var val = $scope.search.query;
+
+                if (!val) {
+                    $searchElm.hide();
+                    $addNewElm.show();
+                    $scope.search.items = [];
+                } else {
+                    runQuery($scope.search.query);
+                }
+            });
+
+            $resultsElm.click(function (e) {
+                var id = e.target.getAttribute('data-id');
+                if (!id) {
+                    return;
+                }
+
+                $scope.search.items.some(function (item) {
+                    if (item.id === id) {
+                        $scope.$apply(function () {
+                            var scopeList = deep($scope, varName);
+                            if (!Array.isArray(scopeList)) {
+                                deep($scope, varName, []);
+                                scopeList = deep($scope, varName);
+                            }
+                            scopeList.push(item);
+
+                            $scope.search.items = [];
+                            $scope.search.query = '';
+                        });
+
+                        return true;
+                    }
+                    return false;
+                });
+            });
+        };
+
+        return directive;
+    };
+
+    app.directive('lkSearch', ['Restangular', '$timeout', Directive]);
+
+    return app;
+};
+},{"../helpers/escape-name":8,"deep-get-set":10}],7:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -400,7 +566,6 @@ module.exports = function (app) {
             varName = 'data';
             if (attr.name) {
                 varName += '.' + attr.name;
-                varName = escapeName(varName);
             }
             attr.varName = varName;
 
@@ -428,7 +593,7 @@ module.exports = function (app) {
                 $scope.data = data;
             } else {
                 if (!$scope.model) {
-                    throw new Error('at leas a name or model property must be defined');
+                    throw new Error('at least a name or model property must be defined');
                 }
                 $scope.data = $scope.model;
             }
@@ -445,7 +610,7 @@ module.exports = function (app) {
                 });
             });
 
-            $scope.$watch(attr.varName, function (current, previous) {
+            $scope.$watch(escapeName(attr.varName), function (current, previous) {
                 if (current === undefined) {
                     return;
                 }
@@ -474,7 +639,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":7,"./lk-var-types":3}],7:[function(require,module,exports){
+},{"../helpers/escape-name":8,"./lk-var-types":3}],8:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -509,7 +674,7 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -535,10 +700,12 @@ module.exports = function (app) {
     app = require('./directives/api')(app);
     // interface to edit data. Check widgets in ./lk-var-types
     app = require('./directives/var')(app);
+    // searches items in an API and adds them to an angular model
+    app = require('./directives/search')(app);
 
     return app;
 };
-},{"./directives/api":1,"./directives/edit":2,"./directives/var":6}],9:[function(require,module,exports){
+},{"./directives/api":1,"./directives/edit":2,"./directives/search":6,"./directives/var":7}],10:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -569,4 +736,4 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
-},{}]},{},[8]);
+},{}]},{},[9]);

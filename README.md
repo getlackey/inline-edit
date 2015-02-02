@@ -48,7 +48,7 @@ one of name or model is required.
 name is a representation of an api request. All '/' are replaced by '.'.
 
 #### model
-Angular model
+Angular model. We're assuming this angular model is some nested property where data came from the REST API, otherwise cancel and save buttons will do nothing.
 
 #### type
 (todo)
