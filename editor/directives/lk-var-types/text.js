@@ -29,7 +29,3 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-
-// module.exports.link = function ($scope, element, attr, lkEdit) {
-
-// };
