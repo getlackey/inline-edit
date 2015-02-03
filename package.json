@@ -1,8 +1,8 @@
 {
     "name": "lackey-inline-edit",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Angularjs Inline editor",
-    "main": "editor/index.js",
+    "main": "lib/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -33,6 +33,7 @@
         "restangular": "^1.4.0"
     },
     "dependencies": {
-        "deep-get-set": "^0.1.1"
+        "deep-get-set": "^0.1.1",
+        "lackey-options-parser": "0.0.x"
     }
 }

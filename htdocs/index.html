@@ -14,29 +14,39 @@
         <br><br>
         <h1> Example </h1>
         <div data-ng-controller="lkExample"> <!-- defined in editor/example.js -->
-            <h2> Using API </h2>
-            <div>
-                Text:<br>
-                <lk-var name="examples.54cf550270dd57019a448ba1.title" type="text"></lk-var>
-            </div>
-
-            <div>
-                List:<br>
-                <lk-var name="examples.54cf550270dd57019a448ba1.items" type="list"></lk-var>
-                <lk-search name="examples.54cf550270dd57019a448ba1.items" resource="examples" match="title"></lk-search>
-            </div>
-
-
             <h2> Using controller </h2>
-            <div>
+            <div class="example">
                 Text:<br>
                 <lk-var model="myData.title" type="text"></lk-var>
             </div>
 
-            <div>
+            <div class="example">
+                Boolean:<br>
+                <lk-var model="myData.isValid" type="boolean"></lk-var>
+            </div>
+
+            <div class="example">
+                Select:<br>
+                <lk-var model="myData.options" type="select" options="1:one two three"></lk-var>
+            </div>
+
+            <div class="example">
                 List:<br>
                 <lk-var model="myData.items" type="list"></lk-var>
                 <lk-search model="myData.items" resource="examples" match="title"></lk-search>
+            </div>
+
+
+            <h2> Using API </h2>
+            <div class="example">
+                Text:<br>
+                <lk-var name="examples.54cf550270dd57019a448ba1.title" type="text"></lk-var>
+            </div>
+
+            <div class="example">
+                List:<br>
+                <lk-var name="examples.54cf550270dd57019a448ba1.items" type="list"></lk-var>
+                <lk-search name="examples.54cf550270dd57019a448ba1.items" resource="examples" match="title"></lk-search>
             </div>
         </div>
 

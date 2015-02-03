@@ -34,3 +34,7 @@ button[disabled] {
     color: #eee;
     cursor: default;
 }
+
+.example {
+    margin: 20px 0;
+}

@@ -9,7 +9,7 @@ module.exports = function browserify(grunt) {
     // Options
     return {
         build: {
-            files: grunt.file.expandMapping('editor/*.js', 'htdocs/js/', {
+            files: grunt.file.expandMapping('lib/*.js', 'htdocs/js/', {
                 flatten: true,
                 ext: '.js'
             }),
