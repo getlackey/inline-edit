@@ -68,6 +68,7 @@ By default the type is text.
 Full list of available types:
 
 - [text](./lib/directives/lk-var-types/text.md)
+- [number](./lib/directives/lk-var-types/number.md)
 - [boolean](./lib/directives/lk-var-types/boolean.md)
 - [select](./lib/directives/lk-var-types/select.md)
 - [list](./lib/directives/lk-var-types/list.md)
