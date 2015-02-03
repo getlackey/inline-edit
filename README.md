@@ -1,9 +1,9 @@
 # Inline Edit
 Angularjs implementation of in-line editing. Assumes all data is passed as an angular model or an HTTP resource following a naming convention.
 
-Requires angularjs, angular-sanitize and restangular.
+Requires angularjs, angular-sanitize and restangular. Developed for modern browsers.
 
-Developed for modern browsers.
+This module is part of the [Lackey framework](https://www.npmjs.com/package/lackey-framework) that is used to build the [Lackey CMS](http://lackey.io) amongst other projects.
 
 ## Install
 
@@ -57,7 +57,7 @@ The http://localhost will be defined in the restangular base url configuration
     	// This defines where our REST API is defined
     	RestangularProvider.setBaseUrl('http://127.0.0.1:8000/api/v1');
 	});
-Please check the [example](./editor/example.js) file.
+Please check the [example](./lib/example.js) file.
 
 #### model
 Angular model. We're assuming this angular model is some nested property where data came from the REST API, otherwise cancel and save buttons will do nothing.
@@ -67,9 +67,10 @@ By default the type is text.
 
 Full list of available types:
 
-- [text](./editor/directives/lk-var-types/text.md)
-- [boolean](./editor/directives/lk-var-types/boolean.md)
-- [list](./editor/directives/lk-var-types/list.md)
+- [text](./lib/directives/lk-var-types/text.md)
+- [boolean](./lib/directives/lk-var-types/boolean.md)
+- [select](./lib/directives/lk-var-types/select.md)
+- [list](./lib/directives/lk-var-types/list.md)
 
 #### placeholder
 Message to be used as placeholder when value is null or empty. Not all elements support this property.
