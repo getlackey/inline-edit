@@ -8,7 +8,7 @@ module.exports = function jslint(grunt) {
     // Options
     return {
         src: [
-            'editor/**/*.js'
+            'lib/**/*.js'
         ]
     };
 };

@@ -7,11 +7,11 @@ module.exports = function watch(grunt) {
     return {
         // watchify all build sub tasks 
         jslint: {
-            files: ['editor/**/*.js'],
+            files: ['lib/**/*.js'],
             tasks: ['jslint']
         },
         browserify: {
-            files: ['editor/**/*.js'],
+            files: ['lib/**/*.js'],
             tasks: ['browserify']
         }
     };
