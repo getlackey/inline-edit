@@ -24,6 +24,9 @@ We're using ng-repeat and using **item** as the var name for each element.
 ## Custom template
 
 	<lk-var model="myData.items" type="list">
+        <!-- If you need to delete the elements add a delete-item class -->
+        <span class="delete-item">[x]<span> 
+        
 		{{ item.title }}<br />
 		type: {{ item.type }}
 	</lk-var>

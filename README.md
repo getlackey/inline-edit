@@ -29,15 +29,15 @@ then open htdocs/index.html and check the example
 ## Usage
 All editable fields must be wrapped up in an element with the lk-edit attribute. 
 
-The save and cancel (to restore database values) buttons are created with &lt;lk-api action=save|cancel&gt;. These tags must also be contained inside the edit tag.
-Finally any editable text should be inserted with the &lt;lk-var&gt; tag
+The save and cancel (to restore database values) buttons are created with directive lk-api action=save|cancel. These tags must also be contained inside the edit tag.
+Finally any editable text should be inserted with the directive lk-var.
 
-### &lt;lk-api&gt;
+### Directive lk-api
 just accepts one attribute: action. 
 
 Action can only be save or cancel. Cancel pulls all data from the API and restores all values.
 
-### &lt;lk-var&gt;
+### Directive lk-var
 takes the following attributes:
 
 #### name 
@@ -68,6 +68,7 @@ By default the type is text.
 Full list of available types:
 
 - [text](./lib/directives/lk-var-types/text.md)
+- [number](./lib/directives/lk-var-types/number.md)
 - [boolean](./lib/directives/lk-var-types/boolean.md)
 - [select](./lib/directives/lk-var-types/select.md)
 - [list](./lib/directives/lk-var-types/list.md)
