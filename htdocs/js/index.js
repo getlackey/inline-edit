@@ -242,7 +242,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":12}],3:[function(require,module,exports){
+},{"deep-get-set":13}],3:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -270,7 +270,7 @@ module.exports.template = function (element, attr) {
     html = '<input type="checkbox" class="eh-data-item" data-ng-name="' + name + '" data-ng-model="' + name + '" />';
     return html;
 };
-},{"../../helpers/escape-name":10}],4:[function(require,module,exports){
+},{"../../helpers/escape-name":11}],4:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -294,9 +294,10 @@ module.exports = {
     text: require('./text'),
     boolean: require('./boolean'),
     select: require('./select'),
-    list: require('./list')
+    list: require('./list'),
+    number: require('./number')
 };
-},{"./boolean":3,"./list":5,"./select":6,"./text":7}],5:[function(require,module,exports){
+},{"./boolean":3,"./list":5,"./number":6,"./select":7,"./text":8}],5:[function(require,module,exports){
 /*jslint node:true, browser:true, nomen:true, unparam:true  */
 'use strict';
 
@@ -343,7 +344,7 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
             return;
         }
 
-        index = list.find('li').index(item);
+        index = list.children('li.list-item').index(item);
 
         if (index !== -1) {
             $scope.$apply(function () {
@@ -353,7 +354,67 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
         }
     });
 };
-},{"../../helpers/escape-name":10,"deep-get-set":12}],6:[function(require,module,exports){
+},{"../../helpers/escape-name":11,"deep-get-set":13}],6:[function(require,module,exports){
+/*jslint node:true, browser:true, unparam:true */
+'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+var deep = require('deep-get-set'),
+    escapeName = require('../../helpers/escape-name');
+
+deep.p = true; //hack to create empty objects
+
+module.exports.template = function (element, attr) {
+    var html = '',
+        name = escapeName(attr.varName),
+        placeholder = attr.placeholder;
+
+    html += '<span class="value" data-ng-bind-html="' + name + '"></span>';
+    html += '<span class="placeholder">' + placeholder + '</span>';
+    html += '<input class="input" type="number" data-ng-name="' + name + '" data-ng-model="' + name + '" />';
+
+    return html;
+};
+
+module.exports.link = function ($scope, element, attr) {
+    var input = element.find('input');
+
+    input.on('keypress', function (e) {
+        e = e || window.event;
+        var charCode = (e.which === undefined) ? e.keyCode : e.which,
+            charStr = String.fromCharCode(charCode);
+
+        if (!/^[0-9]+$/.test(charStr)) {
+            return false;
+        }
+    });
+
+    $scope.$watch(escapeName(attr.varName), function (current, previous) {
+        if (current === undefined && previous !== undefined && previous !== null) {
+            setTimeout(function () {
+                $scope.$apply(function () {
+                    deep($scope, attr.varName, previous);
+                    window.alert('You tried to paste invalid data');
+                });
+            });
+        }
+    });
+};
+},{"../../helpers/escape-name":11,"deep-get-set":13}],7:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 
@@ -379,7 +440,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"../../helpers/escape-name":10,"deep-get-set":12,"lackey-options-parser":15,"path":13}],7:[function(require,module,exports){
+},{"../../helpers/escape-name":11,"deep-get-set":13,"lackey-options-parser":16,"path":14}],8:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -411,7 +472,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"../../helpers/escape-name":10}],8:[function(require,module,exports){
+},{"../../helpers/escape-name":11}],9:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true, nomen:true */
 'use strict';
 
@@ -429,7 +490,8 @@ module.exports = function (app) {
         directive.restrict = 'E';
 
         directive.scope = {
-            model: '='
+            model: '=',
+            hook: '='
         };
 
         directive.template = function (element, attr) {
@@ -458,12 +520,15 @@ module.exports = function (app) {
                 field = attr.match,
                 filter = (attr.filter && attr.filter + ',') || '',
                 Entity = Restangular.all(attr.resource),
+                type = attr.type || 'array',
                 data,
-                varName;
+                varName = '';
 
-            varName = 'data';
+
             if (attr.name) {
-                varName += '.' + attr.name;
+                varName += 'data.' + attr.name;
+            } else {
+                varName += 'model';
             }
 
             $scope.search = {
@@ -476,10 +541,9 @@ module.exports = function (app) {
                 data = lkEdit.getData(attr.name);
                 $scope.data = data;
             } else {
-                if (!$scope.model) {
+                if ($scope.model === undefined) {
                     throw new Error('at least a name or model property must be defined');
                 }
-                $scope.data = $scope.model;
             }
 
             function runQuery(query) {
@@ -547,13 +611,22 @@ module.exports = function (app) {
                 $scope.search.items.some(function (item) {
                     if (item.id === id) {
                         $scope.$apply(function () {
-                            var scopeList = deep($scope, varName);
+                            var scopeList = deep($scope, varName),
+                                itemData = item;
 
-                            if (!Array.isArray(scopeList)) {
-                                deep($scope, varName, []);
-                                scopeList = deep($scope, varName);
+                            if ($scope.hook) {
+                                itemData = $scope.hook(item);
                             }
-                            scopeList.push(item);
+
+                            if (type === 'array') {
+                                if (!Array.isArray(scopeList)) {
+                                    deep($scope, varName, []);
+                                    scopeList = deep($scope, varName);
+                                }
+                                scopeList.push(itemData);
+                            } else {
+                                deep($scope, varName, itemData);
+                            }
 
                             $scope.search.items = [];
                             $scope.search.query = '';
@@ -573,7 +646,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":10,"deep-get-set":12}],9:[function(require,module,exports){
+},{"../helpers/escape-name":11,"deep-get-set":13}],10:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -621,9 +694,10 @@ module.exports = function (app) {
                 attr.placeholder = 'Click to add value';
             }
 
-            varName = 'data';
             if (attr.name) {
-                varName += '.' + attr.name;
+                varName += 'data.' + attr.name;
+            } else {
+                varName += 'model';
             }
             attr.varName = varName;
 
@@ -645,16 +719,17 @@ module.exports = function (app) {
 
             type = attr.type;
 
-            // Get Data
+            // Get Data from REST API or use the model directly
+            // from now on we forget all other vars and use $scope.data...
             if (attr.name) {
                 data = lkEdit.getData(attr.name);
                 $scope.data = data;
             } else {
-                if (!$scope.model) {
+                if ($scope.model === undefined) {
                     throw new Error('at least a name or model property must be defined');
                 }
-                $scope.data = $scope.model;
             }
+
 
             // Events
             document.addEventListener('click', function () {
@@ -669,20 +744,14 @@ module.exports = function (app) {
             });
 
             $scope.$watch(escapeName(attr.varName), function (current, previous) {
-                if (current === undefined) {
-                    return;
+                if (current === undefined || current === null) {
+                    element.addClass('no-data');
+                } else {
+                    element.removeClass('no-data');
                 }
 
-                if (current !== previous) {
-                    if (!current) {
-                        element.addClass('no-data');
-                    } else {
-                        element.removeClass('no-data');
-                    }
-
-                    if (previous !== undefined) {
-                        lkEdit.$scope.$emit('changed');
-                    }
+                if (current !== previous && previous !== undefined) {
+                    lkEdit.$scope.$emit('changed');
                 }
             }, true);
 
@@ -697,7 +766,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":10,"./lk-var-types":4}],10:[function(require,module,exports){
+},{"../helpers/escape-name":11,"./lk-var-types":4}],11:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -732,7 +801,7 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -763,7 +832,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"./directives/api":1,"./directives/edit":2,"./directives/search":8,"./directives/var":9}],12:[function(require,module,exports){
+},{"./directives/api":1,"./directives/edit":2,"./directives/search":9,"./directives/var":10}],13:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -794,7 +863,7 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1022,7 +1091,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":14}],14:[function(require,module,exports){
+},{"_process":15}],15:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1081,7 +1150,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (process){
 /*jslint node:true, browser:true */
 'use strict';
@@ -1280,7 +1349,7 @@ module.exports = function optionsParser(opts) {
     return parseObj(opts);
 };
 }).call(this,require('_process'))
-},{"_process":14,"lackey-make-title":16,"path":13}],16:[function(require,module,exports){
+},{"_process":15,"lackey-make-title":17,"path":14}],17:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -1325,4 +1394,4 @@ module.exports = function (name) {
     title = title.charAt(0).toUpperCase() + title.substring(1);
     return title;
 };
-},{}]},{},[11]);
+},{}]},{},[12]);
