@@ -34,6 +34,7 @@
     },
     "dependencies": {
         "deep-get-set": "^0.1.1",
-        "lackey-options-parser": "0.0.x"
+        "dots2brackets": "0.0.1",
+        "objectpath": "^1.1.0"
     }
 }
