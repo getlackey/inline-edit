@@ -43511,7 +43511,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":18}],7:[function(require,module,exports){
+},{"deep-get-set":17}],7:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -43530,7 +43530,7 @@ module.exports = function (app) {
     limitations under the License.
 */
 
-var escapeName = require('../../helpers/escape-name');
+var escapeName = require('dots2brackets');
 
 module.exports.template = function (element, attr) {
     var html = '',
@@ -43539,7 +43539,7 @@ module.exports.template = function (element, attr) {
     html = '<input type="checkbox" class="eh-data-item" data-ng-name="' + name + '" data-ng-model="' + name + '" />';
     return html;
 };
-},{"../../helpers/escape-name":16}],8:[function(require,module,exports){
+},{"dots2brackets":18}],8:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -43571,7 +43571,7 @@ module.exports = {
 'use strict';
 
 var deep = require('deep-get-set'),
-    escapeName = require('../../helpers/escape-name');
+    escapeName = require('dots2brackets');
 
 deep.p = true; //hack to create empty objects
 
@@ -43623,7 +43623,7 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
         }
     });
 };
-},{"../../helpers/escape-name":16,"deep-get-set":18}],10:[function(require,module,exports){
+},{"deep-get-set":17,"dots2brackets":18}],10:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -43643,7 +43643,7 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
 */
 
 var deep = require('deep-get-set'),
-    escapeName = require('../../helpers/escape-name');
+    escapeName = require('dots2brackets');
 
 deep.p = true; //hack to create empty objects
 
@@ -43683,14 +43683,14 @@ module.exports.link = function ($scope, element, attr) {
         }
     });
 };
-},{"../../helpers/escape-name":16,"deep-get-set":18}],11:[function(require,module,exports){
+},{"deep-get-set":17,"dots2brackets":18}],11:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 
 var path = require('path'),
     optionsParser = require('lackey-options-parser'),
     deep = require('deep-get-set'),
-    escapeName = require('../../helpers/escape-name');
+    escapeName = require('dots2brackets');
 
 deep.p = true; //hack to create empty objects
 
@@ -43709,7 +43709,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"../../helpers/escape-name":16,"deep-get-set":18,"lackey-options-parser":21,"path":19}],12:[function(require,module,exports){
+},{"deep-get-set":17,"dots2brackets":18,"lackey-options-parser":21,"path":19}],12:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -43728,7 +43728,7 @@ module.exports.template = function (element, attr) {
     limitations under the License.
 */
 
-var escapeName = require('../../helpers/escape-name');
+var escapeName = require('dots2brackets');
 
 module.exports.template = function (element, attr) {
     var html = '',
@@ -43741,11 +43741,11 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"../../helpers/escape-name":16}],13:[function(require,module,exports){
+},{"dots2brackets":18}],13:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true, nomen:true */
 'use strict';
 
-var escapeName = require('../helpers/escape-name'),
+var escapeName = require('dots2brackets'),
     deep = require('deep-get-set');
 
 deep.p = true; //hack to create empty objects
@@ -43871,6 +43871,15 @@ module.exports = function (app) {
                 }
             });
 
+            element.find('input').on('keyup', function () {
+                var val = $scope.search.query;
+                if (!val) {
+                    $searchElm.hide();
+                    $addNewElm.show();
+                    $scope.search.items = [];
+                }
+            });
+
             $resultsElm.click(function (e) {
                 var id = e.target.getAttribute('data-id');
                 if (!id) {
@@ -43899,6 +43908,12 @@ module.exports = function (app) {
 
                             $scope.search.items = [];
                             $scope.search.query = '';
+
+                            setTimeout(function () {
+                                $searchElm.hide();
+                                $addNewElm.show();
+                                $scope.search.items = [];
+                            });
                         });
 
                         return true;
@@ -43915,7 +43930,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":16,"deep-get-set":18}],14:[function(require,module,exports){
+},{"deep-get-set":17,"dots2brackets":18}],14:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -43934,7 +43949,7 @@ module.exports = function (app) {
     limitations under the License.
 */
 
-var escapeName = require('../helpers/escape-name');
+var escapeName = require('dots2brackets');
 
 module.exports = function (app) {
     app.directive('lkVar', function () {
@@ -44035,7 +44050,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"../helpers/escape-name":16,"./lk-var-types":8}],15:[function(require,module,exports){
+},{"./lk-var-types":8,"dots2brackets":18}],15:[function(require,module,exports){
 /*jslint node:true, browser:true, nomen: true */
 /*global angular */
 'use strict';
@@ -44113,42 +44128,7 @@ module.exports = function () {
     // just because.... 
     return app;
 };
-},{"./../bower_components/angular-sanitize/angular-sanitize.js":1,"./../bower_components/angular/angular.js":2,"./../bower_components/jquery/dist/jquery.js":3,"./../bower_components/lodash/dist/lodash.compat.js":4,"./index.js":17,"restangular":23}],16:[function(require,module,exports){
-/*jslint node:true, browser:true */
-'use strict';
-/*
-    Copyright 2015 Enigma Marketing Services Limited
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
-
-module.exports = function (name) {
-    var escaped = name;
-
-    if (escaped.indexOf('.') === -1) {
-        return escaped;
-    }
-
-    escaped = escaped.replace('.', '[\'');
-    escaped = escaped.replace(/\./g, '\'][\'');
-
-    if (escaped[escaped.length - 1] !== ']') {
-        escaped += '\']';
-    }
-
-    return escaped;
-};
-},{}],17:[function(require,module,exports){
+},{"./../bower_components/angular-sanitize/angular-sanitize.js":1,"./../bower_components/angular/angular.js":2,"./../bower_components/jquery/dist/jquery.js":3,"./../bower_components/lodash/dist/lodash.compat.js":4,"./index.js":16,"restangular":23}],16:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -44179,7 +44159,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"./directives/api":5,"./directives/edit":6,"./directives/search":13,"./directives/var":14}],18:[function(require,module,exports){
+},{"./directives/api":5,"./directives/edit":6,"./directives/search":13,"./directives/var":14}],17:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -44210,6 +44190,40 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
+},{}],18:[function(require,module,exports){
+/*jslint node:true, browser:true */
+'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+module.exports = function (name) {
+    var escaped = name;
+
+    if (escaped.indexOf('.') === -1) {
+        return escaped;
+    }
+
+    escaped = escaped.replace('.', '[\'');
+    escaped = escaped.replace(/\./g, '\'][\'');
+
+    if (escaped[escaped.length - 1] !== ']') {
+        escaped += '\']';
+    }
+
+    return escaped;
+};
 },{}],19:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
