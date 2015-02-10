@@ -52,16 +52,12 @@ module.exports = function (app) {
                 }
             });
 
-            lkEdit.$scope.$on('error', function (err) {
-                console.error(err);
-            });
-
-            lkEdit.$scope.$on('saved', function (err) {
+            lkEdit.$scope.$on('saved', function () {
                 window.onbeforeunload = null;
                 button.attr('disabled', true);
             });
 
-            lkEdit.$scope.$on('reloaded', function (err) {
+            lkEdit.$scope.$on('reloaded', function () {
                 // the event is emitted before the $watch is triggered
                 // and the changed event is emitted
                 setTimeout(function () {
@@ -242,7 +238,75 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":12}],3:[function(require,module,exports){
+},{"deep-get-set":13}],3:[function(require,module,exports){
+/*jslint node:true, browser:true, unparam:true */
+'use strict';
+/*
+    Copyright 2015 Enigma Marketing Services Limited
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+module.exports = function (app) {
+    var Directive = function () {
+        var directive = {};
+
+        directive.require = '^lkEdit';
+
+        directive.restrict = 'E';
+
+        directive.scope = {
+            ttl: '@'
+        };
+
+        directive.link = function ($scope, element, attr, lkEdit) {
+            var html = '',
+                timer;
+
+            lkEdit.$scope.$on('error', function (evt, req) {
+                clearTimeout(timer);
+
+                html += '<div class="error">';
+                html += req.data.message || 'An error occurred.';
+                html += '</div>';
+
+                element.html(html);
+
+                //remove error after 5 sec
+                timer = setTimeout(function () {
+                    element.html('');
+                }, (+$scope.ttl || 7000));
+            });
+
+            lkEdit.$scope.$on('saved', function (err) {
+                clearTimeout(timer);
+                element.html('');
+            });
+
+            lkEdit.$scope.$on('reloaded', function (err) {
+                clearTimeout(timer);
+                element.html('');
+            });
+        };
+
+        return directive;
+    };
+
+    app.directive('lkError', Directive);
+
+    return app;
+};
+},{}],4:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -270,7 +334,7 @@ module.exports.template = function (element, attr) {
     html = '<input type="checkbox" class="eh-data-item" data-ng-name="' + name + '" data-ng-model="' + name + '" />';
     return html;
 };
-},{"dots2brackets":13}],4:[function(require,module,exports){
+},{"dots2brackets":14}],5:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -297,7 +361,7 @@ module.exports = {
     list: require('./list'),
     number: require('./number')
 };
-},{"./boolean":3,"./list":5,"./number":6,"./select":7,"./text":8}],5:[function(require,module,exports){
+},{"./boolean":4,"./list":6,"./number":7,"./select":8,"./text":9}],6:[function(require,module,exports){
 /*jslint node:true, browser:true, nomen:true, unparam:true  */
 'use strict';
 
@@ -354,7 +418,7 @@ module.exports.link = function ($scope, element, attr, lkEdit) {
         }
     });
 };
-},{"deep-get-set":12,"dots2brackets":13}],6:[function(require,module,exports){
+},{"deep-get-set":13,"dots2brackets":14}],7:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -414,7 +478,7 @@ module.exports.link = function ($scope, element, attr) {
         }
     });
 };
-},{"deep-get-set":12,"dots2brackets":13}],7:[function(require,module,exports){
+},{"deep-get-set":13,"dots2brackets":14}],8:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 
@@ -440,7 +504,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"deep-get-set":12,"dots2brackets":13,"lackey-options-parser":16,"path":14}],8:[function(require,module,exports){
+},{"deep-get-set":13,"dots2brackets":14,"lackey-options-parser":17,"path":15}],9:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true */
 'use strict';
 /*
@@ -472,7 +536,7 @@ module.exports.template = function (element, attr) {
 
     return html;
 };
-},{"dots2brackets":13}],9:[function(require,module,exports){
+},{"dots2brackets":14}],10:[function(require,module,exports){
 /*jslint node:true, browser:true, unparam:true, nomen:true */
 'use strict';
 
@@ -661,7 +725,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"deep-get-set":12,"dots2brackets":13}],10:[function(require,module,exports){
+},{"deep-get-set":13,"dots2brackets":14}],11:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -781,7 +845,7 @@ module.exports = function (app) {
 
     return app;
 };
-},{"./lk-var-types":4,"dots2brackets":13}],11:[function(require,module,exports){
+},{"./lk-var-types":5,"dots2brackets":14}],12:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -807,12 +871,14 @@ module.exports = function (app) {
     app = require('./directives/api')(app);
     // interface to edit data. Check widgets in ./lk-var-types
     app = require('./directives/var')(app);
+    // exposes the error messages
+    app = require('./directives/error')(app);
     // searches items in an API and adds them to an angular model
     app = require('./directives/search')(app);
 
     return app;
 };
-},{"./directives/api":1,"./directives/edit":2,"./directives/search":9,"./directives/var":10}],12:[function(require,module,exports){
+},{"./directives/api":1,"./directives/edit":2,"./directives/error":3,"./directives/search":10,"./directives/var":11}],13:[function(require,module,exports){
 module.exports = deep;
 
 function deep (obj, path, value) {
@@ -843,7 +909,7 @@ function set (obj, path, value) {
   obj[keys[i]] = value;
   return value;
 }
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -877,7 +943,7 @@ module.exports = function (name) {
 
     return escaped;
 };
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -1105,7 +1171,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":15}],15:[function(require,module,exports){
+},{"_process":16}],16:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1164,7 +1230,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (process){
 /*jslint node:true, browser:true */
 'use strict';
@@ -1363,7 +1429,7 @@ module.exports = function optionsParser(opts) {
     return parseObj(opts);
 };
 }).call(this,require('_process'))
-},{"_process":15,"lackey-make-title":17,"path":14}],17:[function(require,module,exports){
+},{"_process":16,"lackey-make-title":18,"path":15}],18:[function(require,module,exports){
 /*jslint node:true, browser:true */
 'use strict';
 /*
@@ -1408,4 +1474,4 @@ module.exports = function (name) {
     title = title.charAt(0).toUpperCase() + title.substring(1);
     return title;
 };
-},{}]},{},[11]);
+},{}]},{},[12]);

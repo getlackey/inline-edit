@@ -21,7 +21,7 @@ then open htdocs/index.html and check the example
             <lk-api action="cancel"></lk-api> <!-- cancel action is optional -->
         </div>
     
-        <lk-error></lk-error><!-- shows error messages -->
+        <lk-error ttl="5000"></lk-error><!-- shows error messages -->
         
         <div>
             <lk-var data-name="products.my-product.slug" data-type="text" data-placeholder="update me"></lk-var>
@@ -38,6 +38,9 @@ Finally any editable text should be inserted with the directive lk-var.
 just accepts one attribute: action. 
 
 Action can only be save or cancel. Cancel pulls all data from the API and restores all values.
+
+### Directive lk-error
+accepts a ttl argument to define how long should the error message remain visible.
 
 ### Directive lk-var
 takes the following attributes:
