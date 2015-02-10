@@ -20,6 +20,8 @@ then open htdocs/index.html and check the example
             <lk-api action="save"></lk-api>
             <lk-api action="cancel"></lk-api> <!-- cancel action is optional -->
         </div>
+    
+        <lk-error></lk-error><!-- shows error messages -->
         
         <div>
             <lk-var data-name="products.my-product.slug" data-type="text" data-placeholder="update me"></lk-var>
