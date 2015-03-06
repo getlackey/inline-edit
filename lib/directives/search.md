@@ -49,6 +49,17 @@ Sometime we need to search not by title, but by any other property, eg. produtcC
         match="produtcCode"
     ></lk-search>
 
+## Search multiple properties
+
+Sometime we want to search by either title or product code
+
+    <lk-search 
+        name="configurators.my-item.components" 
+        resource="components"
+        match="produtcCode,title"
+    ></lk-search>
+
+That will also change the default template to show both results separated by space
 
 ## Convert schema
 On some occasions we need to have an easy way of changing the format of the data we are pushing to the list
