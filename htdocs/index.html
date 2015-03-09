@@ -12,41 +12,67 @@
         <lk-api action="cancel">Cancel</lk-api>
 
         <br><br>
-        <h1> Example </h1>
-        <div data-ng-controller="lkExample"> <!-- defined in editor/example.js -->
-            <h2> Using controller </h2>
+        <h1> Examples </h1>
+        <div my-edit> <!-- defined in editor/example.js -->
             <div class="example">
-                Text:<br>
-                <lk-var model="myData.title" type="text"></lk-var>
+                Below is an example of setting up my page title and introduction to be editable, using "name" and "type" attribute of text:<br>
+                <code>
+                    &lt;h2&gt;&lt;lk-var name="demos.demo-7324.title" type="text">&lt;/lk-var&gt;&lt;/h2&gt;<br>
+                    &lt;p&gt;&lt;lk-var name="demos.demo-7324.intro" type="text">&lt;/lk-var&gt;&lt;/p&gt;
+                </code>
+                <h2><lk-var name="demos.demo-7324.title" type="text"></lk-var></h2>
+                <p><lk-var name="demos.demo-7324.intro" type="text"></lk-var></p>
             </div>
-
+            
             <div class="example">
-                Boolean:<br>
-                <lk-var model="myData.isValid" type="boolean"></lk-var>
+                Using booleans is simular to text except we are changing the "type" to boolean, giving us checkbox for selecting true or false:<br>
+                <code>
+                    &lt;lk-var name="demos.demo-7324.publish" type="boolean"&gt;&lt;/lk-var&gt;
+                </code><br><br>
+                Publish Article: <lk-var name="demos.demo-7324.publish" type="boolean"></lk-var>
             </div>
-
+            
             <div class="example">
-                Select:<br>
-                <lk-var model="myData.options" type="select" options="1:one two three"></lk-var>
+                To use a select menu, we change the "type" to select and add the attribute "options", there are a few different ways to format options, i have used space seperated values, using camelCase to give spaces<br>
+                <code>
+                    &lt;lk-var name="demos.demo-7324.layout" type="select" options="OneColumn TwoColumn ThreeColumn"&gt;&lt;/lk-var&gt;
+                </code><br><br>
+                Page Layout: <lk-var name="demos.demo-7324.layout" type="select" options="OneColumn TwoColumn ThreeColumn"></lk-var>
             </div>
-
-            <div class="example">
-                List:<br>
-                <lk-var model="myData.items" type="list"></lk-var>
-                <lk-search model="myData.items" resource="examples" match="title"></lk-search>
+            
+             <div class="example">
+                The standard list, using the "type" of list, outputs a lsit of an array with a delete option for each item. <br>
+                 <code>
+                    &lt;lk-var name="demos.demo-7324.list" type="list"&gt;&lt;/lk-var&gt;
+                </code><br>
+                <lk-var name="demos.demo-7324.list" type="list"></lk-var>
             </div>
-
-
-            <h2> Using API </h2>
+            
             <div class="example">
-                Text:<br>
-                <lk-var name="examples.54cf550270dd57019a448ba1.title" type="text"></lk-var>
+                To expand on the standard list, we can create custom lists, for example a todo list<br>
+                Inside of our list from above we can add a custom template such as :<br>
+                <code>
+                    &lt;lk-var model="item.title" type="text"&gt;&lt;/lk-var&gt; &lt;span class="delete-item"&gt;&lt;/span&gt;
+                </code><br>
+                Doing so, we can access the text of title and make edits. We also needed to add the delete icon manually as its now a custom template<br>
+                To add an item to the todolist, a button was added and a custom function written in the controller
+                <lk-var name="demos.demo-7324.list" type="list">
+                    <lk-var model="item.title" type="text"></lk-var><span class="delete-item">[x]</span>
+                </lk-var>
+                <button ng-click="myEdit.addTodoItem('demos.demo-7324.list')">Add Todo</button>
             </div>
-
+            
             <div class="example">
-                List:<br>
-                <lk-var name="examples.54cf550270dd57019a448ba1.items" type="list"></lk-var>
-                <lk-search name="examples.54cf550270dd57019a448ba1.items" resource="examples" match="title"></lk-search>
+                To expand further, instead of deleting items off our list, we want to set themt to completed.<br>
+                Adding a boolean value of complete to the item schema and the following code to our template:<br>
+                <code>
+                    &lt;lk-var model="item.complete" type="boolean"&gt;&lt;/lk-var&gt;
+                </code><br>
+                we can now use a checkbox to set an item on the todo list to complete or incomplete
+                <lk-var name="demos.demo-7324.list" type="list">
+                    <lk-var model="item.title" type="text"></lk-var> <lk-var model="item.complete" type="boolean"></lk-var>
+                </lk-var>
+                <button ng-click="myEdit.addTodoItem('demos.demo-7324.list')">Add Todo</button>
             </div>
         </div>
 

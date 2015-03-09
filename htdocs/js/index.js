@@ -176,6 +176,10 @@ module.exports = function (app) {
                 return $scope;
             };
 
+            self.getModel = function (name) {
+                return deep($scope, name);
+            };
+            
             self.saveAll = function () {
                 var promisses = [];
 
@@ -805,7 +809,7 @@ module.exports = function (app) {
                 fields.replace(/ /g, '').split(',').forEach(function (field) {
                     var opts = {};
 
-                    opts.limit = 10;
+                    opts.limit = 50;
                     opts.filter = filter + field + ':*' + query;
 
                     promises.push(Entity.getList(opts));

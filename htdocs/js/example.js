@@ -44493,6 +44493,10 @@ module.exports = function (app) {
                 return $scope;
             };
 
+            self.getModel = function (name) {
+                return deep($scope, name);
+            };
+            
             self.saveAll = function () {
                 var promisses = [];
 
@@ -45122,7 +45126,7 @@ module.exports = function (app) {
                 fields.replace(/ /g, '').split(',').forEach(function (field) {
                     var opts = {};
 
-                    opts.limit = 10;
+                    opts.limit = 50;
                     opts.filter = filter + field + ':*' + query;
 
                     promises.push(Entity.getList(opts));
@@ -45411,6 +45415,7 @@ app = angular.module('lkEdit', ['restangular', 'ngSanitize']);
 
 app.config(function (RestangularProvider) {
     // This defines where our REST API is defined
+    //RestangularProvider.setBaseUrl('https://lackey.io/api/v1');
     RestangularProvider.setBaseUrl('http://127.0.0.1:8000/api/v1');
 
     // The cancel button will not work if your API is setting etags.
@@ -45423,19 +45428,36 @@ app.config(function (RestangularProvider) {
     });
 });
 
-app.controller('lkExample', function ($scope) {
-    $scope.myData = {
-        title: 'My 1st title',
-        items: [{
-            title: '1st',
-            type: 'A'
-        }, {
-            title: '2nd',
-            type: 'B'
-        }],
-        options: [],
-        isValid: true
+app.directive('myEdit', function(){
+    var directive = {};
+
+    directive.controllerAs = 'myEdit';
+    
+    directive.require = '^lkEdit';
+
+    directive.restrict = 'A';
+
+    directive.scope = false;
+
+    directive.controller = function ($scope) {
+        this.addTodoItem = function (name) {
+            var model = $scope.lkEdit.getModel(name),
+                doc = {
+                    "title": 'new todo',
+                    "complete": false
+                };
+            
+            model.push(doc);
+        };
     };
+    
+
+    directive.link = function ($scope, element, attr, lkEdit) {
+        //exposes lk-edit in the controller scope
+        $scope.lkEdit = lkEdit;
+    };
+
+    return directive;
 });
 
 // initialise our editor
