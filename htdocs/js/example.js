@@ -649,7 +649,7 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 },{}],2:[function(require,module,exports){
 /**
- * @license AngularJS v1.4.0-build.3887+sha.41fdb3d
+ * @license AngularJS v1.4.0-build.3891+sha.fb7db4a
  * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -707,7 +707,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message += '\nhttp://errors.angularjs.org/1.4.0-build.3887+sha.41fdb3d/' +
+    message += '\nhttp://errors.angularjs.org/1.4.0-build.3891+sha.fb7db4a/' +
       (module ? module + '/' : '') + code;
 
     for (i = SKIP_INDEXES, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
@@ -2912,7 +2912,7 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.4.0-build.3887+sha.41fdb3d',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.4.0-build.3891+sha.fb7db4a',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 4,
   dot: 0,
@@ -11064,6 +11064,7 @@ function $IntervalProvider() {
       *   indefinitely.
       * @param {boolean=} [invokeApply=true] If set to `false` skips model dirty checking, otherwise
       *   will invoke `fn` within the {@link ng.$rootScope.Scope#$apply $apply} block.
+      * @param {...*=} Pass additional parameters to the executed function.
       * @returns {promise} A promise which will be notified on each iteration.
       *
       * @example
@@ -11157,7 +11158,9 @@ function $IntervalProvider() {
       * </example>
       */
     function interval(fn, delay, count, invokeApply) {
-      var setInterval = $window.setInterval,
+      var hasParams = arguments.length > 4,
+          args = hasParams ? sliceArgs(arguments, 4) : [],
+          setInterval = $window.setInterval,
           clearInterval = $window.clearInterval,
           iteration = 0,
           skipApply = (isDefined(invokeApply) && !invokeApply),
@@ -11166,7 +11169,9 @@ function $IntervalProvider() {
 
       count = isDefined(count) ? count : 0;
 
-      promise.then(null, null, fn);
+      promise.then(null, null, (!hasParams) ? fn : function() {
+        fn.apply(null, args);
+      });
 
       promise.$$intervalId = setInterval(function tick() {
         deferred.notify(iteration++);
@@ -14984,8 +14989,26 @@ function $RootScopeProvider() {
     return TTL;
   };
 
+  function createChildScopeClass(parent) {
+    function ChildScope() {
+      this.$$watchers = this.$$nextSibling =
+          this.$$childHead = this.$$childTail = null;
+      this.$$listeners = {};
+      this.$$listenerCount = {};
+      this.$$watchersCount = 0;
+      this.$id = nextUid();
+      this.$$ChildScope = null;
+    }
+    ChildScope.prototype = parent;
+    return ChildScope;
+  }
+
   this.$get = ['$injector', '$exceptionHandler', '$parse', '$browser',
       function($injector, $exceptionHandler, $parse, $browser) {
+
+    function destroyChildScope($event) {
+        $event.currentScope.$$destroyed = true;
+    }
 
     /**
      * @ngdoc type
@@ -15110,16 +15133,7 @@ function $RootScopeProvider() {
           // Only create a child scope class if somebody asks for one,
           // but cache it to allow the VM to optimize lookups.
           if (!this.$$ChildScope) {
-            this.$$ChildScope = function ChildScope() {
-              this.$$watchers = this.$$nextSibling =
-                  this.$$childHead = this.$$childTail = null;
-              this.$$listeners = {};
-              this.$$listenerCount = {};
-              this.$$watchersCount = 0;
-              this.$id = nextUid();
-              this.$$ChildScope = null;
-            };
-            this.$$ChildScope.prototype = this;
+            this.$$ChildScope = createChildScopeClass(this);
           }
           child = new this.$$ChildScope();
         }
@@ -15137,13 +15151,9 @@ function $RootScopeProvider() {
         // prototypically. In all other cases, this property needs to be set
         // when the parent scope is destroyed.
         // The listener needs to be added after the parent is set
-        if (isolate || parent != this) child.$on('$destroy', destroyChild);
+        if (isolate || parent != this) child.$on('$destroy', destroyChildScope);
 
         return child;
-
-        function destroyChild() {
-          child.$$destroyed = true;
-        }
       },
 
       /**
@@ -17657,6 +17667,7 @@ function $TimeoutProvider() {
       * @param {number=} [delay=0] Delay in milliseconds.
       * @param {boolean=} [invokeApply=true] If set to `false` skips model dirty checking, otherwise
       *   will invoke `fn` within the {@link ng.$rootScope.Scope#$apply $apply} block.
+      * @param {...*=} Pass additional parameters to the executed function.
       * @returns {Promise} Promise that will be resolved when the timeout is reached. The value this
       *   promise will be resolved with is the return value of the `fn` function.
       *
@@ -17668,14 +17679,15 @@ function $TimeoutProvider() {
         fn = noop;
       }
 
-      var skipApply = (isDefined(invokeApply) && !invokeApply),
+      var args = sliceArgs(arguments, 3),
+          skipApply = (isDefined(invokeApply) && !invokeApply),
           deferred = (skipApply ? $$q : $q).defer(),
           promise = deferred.promise,
           timeoutId;
 
       timeoutId = $browser.defer(function() {
         try {
-          deferred.resolve(fn());
+          deferred.resolve(fn.apply(null, args));
         } catch (e) {
           deferred.reject(e);
           $exceptionHandler(e);
@@ -44496,7 +44508,7 @@ module.exports = function (app) {
             self.getModel = function (name) {
                 return deep($scope, name);
             };
-            
+
             self.saveAll = function () {
                 var promisses = [];
 
@@ -44993,7 +45005,7 @@ module.exports = function (app) {
 
         directive.template = function (element, attr) {
             var html = '',
-                fields = attr.match,
+                fields = attr.match || 'title',
                 template = (element[0] && element[0].innerHTML) || '';
 
             if (!template) {
@@ -45428,11 +45440,11 @@ app.config(function (RestangularProvider) {
     });
 });
 
-app.directive('myEdit', function(){
+app.directive('myEdit', function () {
     var directive = {};
 
     directive.controllerAs = 'myEdit';
-    
+
     directive.require = '^lkEdit';
 
     directive.restrict = 'A';
@@ -45446,11 +45458,11 @@ app.directive('myEdit', function(){
                     "title": 'new todo',
                     "complete": false
                 };
-            
+
             model.push(doc);
         };
     };
-    
+
 
     directive.link = function ($scope, element, attr, lkEdit) {
         //exposes lk-edit in the controller scope

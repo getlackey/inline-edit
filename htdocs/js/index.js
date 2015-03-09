@@ -179,7 +179,7 @@ module.exports = function (app) {
             self.getModel = function (name) {
                 return deep($scope, name);
             };
-            
+
             self.saveAll = function () {
                 var promisses = [];
 
@@ -676,7 +676,7 @@ module.exports = function (app) {
 
         directive.template = function (element, attr) {
             var html = '',
-                fields = attr.match,
+                fields = attr.match || 'title',
                 template = (element[0] && element[0].innerHTML) || '';
 
             if (!template) {
