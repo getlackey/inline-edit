@@ -1005,7 +1005,7 @@ module.exports = function (app) {
             element.click(function () {
                 setTimeout(function () {
                     element.addClass('edit');
-                    element.find('input').focus();
+//                    element.find('input').focus();
                 });
             });
 
