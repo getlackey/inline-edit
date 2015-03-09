@@ -1,44 +1,42 @@
 {
-  "name": "lackey-inline-edit",
-  "version": "0.5.0",
-  "description": "Angularjs Inline editor",
-  "main": "lib/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Enigma Marketing <admin@enigma-marketing.co.uk> (http://www.enigma-marketing.co.uk)",
-  "licenses": [
-    {
-      "type": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    "name": "lackey-inline-edit",
+    "version": "0.5.0",
+    "description": "Angularjs Inline editor",
+    "main": "lib/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Enigma Marketing <admin@enigma-marketing.co.uk> (http://www.enigma-marketing.co.uk)",
+    "licenses": [{
+        "type": "Apache 2.0",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/getlackey/inline-edit.git"
+    },
+    "browserify": {
+        "transform": [
+            "debowerify"
+        ]
+    },
+    "devDependencies": {
+        "debowerify": "^1.2.0",
+        "grunt": "^0.4.5",
+        "grunt-browserify": "^3.2.1",
+        "grunt-config-dir": "^0.3.2",
+        "grunt-contrib-uglify": "^0.7.0",
+        "grunt-contrib-watch": "^0.6.1",
+        "grunt-jslint": "^1.1.12",
+        "grunt-shell": "^1.1.1",
+        "grunt-supervisor": "^0.2.4",
+        "restangular": "^1.4.0"
+    },
+    "dependencies": {
+        "deep-get-set": "^0.1.1",
+        "dots2brackets": "0.0.1",
+        "lackey-options-parser": "0.0.3",
+        "objectpath": "^1.1.0",
+        "q": "^1.2.0"
     }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/getlackey/inline-edit.git"
-  },
-  "browserify": {
-    "transform": [
-      "debowerify"
-    ]
-  },
-  "devDependencies": {
-    "debowerify": "^1.2.0",
-    "grunt": "^0.4.5",
-    "grunt-browserify": "^3.2.1",
-    "grunt-config-dir": "^0.3.2",
-    "grunt-contrib-uglify": "^0.7.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-jslint": "^1.1.12",
-    "grunt-shell": "^1.1.1",
-    "grunt-supervisor": "^0.2.4",
-    "restangular": "^1.4.0"
-  },
-  "dependencies": {
-    "deep-get-set": "^0.1.1",
-    "dots2brackets": "0.0.1",
-    "lackey-options-parser": "0.0.3",
-    "objectpath": "^1.1.0",
-    "q": "^1.2.0"
-  }
 }
