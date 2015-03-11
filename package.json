@@ -1,6 +1,6 @@
 {
     "name": "lackey-inline-edit",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Angularjs Inline editor",
     "main": "lib/index.js",
     "scripts": {
@@ -35,6 +35,7 @@
     "dependencies": {
         "deep-get-set": "^0.1.1",
         "dots2brackets": "0.0.1",
+        "lackey-options-parser": "0.0.3",
         "objectpath": "^1.1.0",
         "q": "^1.2.0"
     }
