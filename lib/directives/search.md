@@ -14,6 +14,16 @@ By default it searches the title property in the documents /api/v1/components?fi
 
 the property name is used when we want to define an API resource. If we already have an angular model we can use model instead.
 
+## Label
+
+The default label for the button is "Add Item". With the label attribute we can define a new value.
+
+    <lk-search 
+            name="configurators.my-item.components" 
+            resource="components"
+            label="Search Component"
+    ></lk-search>
+
 ## Type
 
 By default lk-search assumes it's being used to add items to an array, but we may choose to use it to replace/populate an object.
