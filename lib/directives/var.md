@@ -2,15 +2,15 @@
 takes the following attributes:
 
 ## name 
-one of name or model is required. Name is a representation of an api request. All '/' are replaced by '.'.
+one of name or model is required. Name is a representation of an api request. All '/' are replaced by '.'. A colon (:) is used as a separator between the API resource and the properties in the returned document.
 
-For instance:
+For instance, the title property in this resource:
     
-    http://localhost/products/a-product/title
+    http://localhost/products/a-product
 
 becomes
 
-    products.a-product.title
+    products.a-product:title
 
 The http://localhost will be defined in the restangular base url configuration
 
