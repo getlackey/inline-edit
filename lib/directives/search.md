@@ -120,5 +120,5 @@ sometime we need to pre-filter our list, eg. products of type 'lowcost'.
         filter="type:lowcost"
     ></lk-search>
 
-This will request data from /api/v1/components?filter=type:lowcost,title:*{{ your-search-string }}
+This will request data from /api/v1/components?find={type:'lowcost',title: {$regex: '.*{{ your-search-string }.*'}}
 
